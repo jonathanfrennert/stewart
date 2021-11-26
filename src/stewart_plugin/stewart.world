@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+
+  <world name="default">
+
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- A Stewart platform -->
+    <model name="stewart">
+      <include>
+        <uri>model://stewart</uri>
+      </include>
+
+      <!-- Attach the plugin to this model -->
+      <plugin name="stewart_control" filename="./libstewart_plugin.so"/>
+    </model>
+
+  </world>
+</sdf>
