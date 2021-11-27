@@ -224,5 +224,7 @@ qtcreator-*
 
 # Catkin custom files
 CATKIN_IGNORE
+.catkin_workspace
+
 
 # End of https://www.toptal.com/developers/gitignore/api/ros,python,c++
