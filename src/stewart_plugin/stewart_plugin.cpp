@@ -1,6 +1,8 @@
 #ifndef _STEWART_PLUGIN_HH_
 #define _STEWART_PLUGIN_HH_
 
+#include "ik.h"
+
 #include <vector>
 #include <thread>
 
@@ -13,6 +15,8 @@
 #include "ros/callback_queue.h"
 #include "ros/subscribe_options.h"
 #include "std_msgs/Float32.h"
+#include "std_msgs/Float32MultiArray.h"
+
 
 namespace gazebo
 {
@@ -46,22 +50,19 @@ namespace gazebo
             this->joints = _model->GetJoints();
 
             // Setup a P-controller, with a gain of 0.1.
-            this->pid = common::PID(0.1, 0, 0);
+            //this->pid = common::PID(10, 0, 10);
+            this->pid = common::PID(10000.0, 0.1, 100.0);
 
 
             // ----------- POSITION -----------
 
             // Apply the P-controller to the position of the joints.
-            for (const auto& joint: joints)
+            for (const auto& joint: this->joints)
             {
               // set joint to PID controller
               this->model->GetJointController()->SetPositionPID(
                   joint->GetScopedName(), this->pid);
-              // initialize the joint position
-              this->model->GetJointController()->SetPositionTarget(
-                  joint->GetScopedName(), 0);
             }
-
 
 
             // ----------- VELOCITY -----------
@@ -71,9 +72,6 @@ namespace gazebo
             {
               this->model->GetJointController()->SetVelocityPID(
                   joint->GetScopedName(), this->pid);
-              // initialize the joint velocity
-              this->model->GetJointController()->SetVelocityTarget(
-                  joint->GetScopedName(), 0);
             }
 
 
@@ -87,15 +85,27 @@ namespace gazebo
              ros::init(argc, argv, "gazebo_client",
                  ros::init_options::NoSigintHandler);
             }
-            else
-              std::cout << "ROS is initialized" << "\n";
+            std::cout << "ROS is initialized" << "\n";
 
+            /*
+            std_msgs::Float32MultiArray msg;
+
+            for (int i = 0; i < 6; i++)
+            {
+                msg.data.push_back(0);
+            }
+
+            Eigen::Matrix<float, 6, 1> x = ik(msg);
+
+            printf("address of %f\n", x[0]);
+            */
 
             // Create our ROS node. This acts in a similar manner to
             // the Gazebo node
             this->rosNode.reset(new ros::NodeHandle("gazebo_client"));
 
-            // Create a named topic, and subscribe to it.
+
+            /*
             ros::SubscribeOptions so =
               ros::SubscribeOptions::create<std_msgs::Float32>(
                 "/" + this->model->GetName() + "/vel_cmd",
@@ -103,19 +113,34 @@ namespace gazebo
                  boost::bind(&StewartPlugin::OnRosMsg, this, _1),
                  ros::VoidPtr(), &this->rosQueue);
             this->rosSub = this->rosNode->subscribe(so);
+            */
 
+
+            std::cout << "Fuck you one!";
+            // Create a named topic, and subscribe to it.
+            ros::SubscribeOptions so = ros::SubscribeOptions::create<std_msgs::Float32MultiArray>(
+                "/" + this->model->GetName() + "/position_cmd",
+                1,
+                boost::bind(&StewartPlugin::setPosition, this, _1),
+                ros::VoidPtr(), &this->rosQueue);
+            this->rosSub = this->rosNode->subscribe(so);
+
+          std::cout << "Fuck you two!";
            // Spin up the queue helper thread.
            this->rosQueueThread =
              std::thread(std::bind(&StewartPlugin::QueueThread, this));
         }
 
 
-        /// \brief Handle an incoming message from ROS
-        /// \param[in] _msg A float value that is used to set the velocity
-        /// of the joints.
-        public: void OnRosMsg(const std_msgs::Float32ConstPtr &_msg)
+        /// \brief Set the velocity of all the joints
+        /// \param[in] _vel New target velocity
+        void setPosition(const std_msgs::Float32MultiArray::ConstPtr& msg)
         {
-          this->SetVelocity(_msg->data);
+            Eigen::Matrix<float, 6, 1> goalJointPos = ik(msg);
+
+            auto joints_it = std::begin(this->joints);
+            for (int i = 0; i < 5; i++)
+                this->model->GetJointController()->SetPositionTarget((*joints_it++)->GetScopedName(), goalJointPos[i]);
         }
 
 
@@ -130,8 +155,20 @@ namespace gazebo
         }
 
 
+        /// \brief Handle an incoming message from ROS
+        /// \param[in] _msg A float value that is used to set the velocity
+        /// of the joints.
+        /*
+        public: void OnRosMsg(const std_msgs::Float32ConstPtr &_msg)
+        {
+          this->SetVelocity(_msg->data);
+        }
+        */
+
+
         /// \brief Set the velocity of all the joints
         /// \param[in] _vel New target velocity
+        /*
         public: void SetVelocity(const double &_vel)
         {
           // Set the joint's target velocity.
@@ -139,6 +176,7 @@ namespace gazebo
             this->model->GetJointController()->SetVelocityTarget(
                 joint->GetScopedName(), _vel);
         }
+        */
 
 
         // ----------- MODEL -----------
