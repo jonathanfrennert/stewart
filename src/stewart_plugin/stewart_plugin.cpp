@@ -9,6 +9,11 @@
 #include <gazebo/transport/transport.hh>
 #include <gazebo/msgs/msgs.hh>
 
+#include "ros/ros.h"
+#include "ros/callback_queue.h"
+#include "ros/subscribe_options.h"
+#include "std_msgs/Float32.h"
+
 namespace gazebo
 {
     /// \brief A plugin to control a Stewart Platform.
@@ -46,52 +51,82 @@ namespace gazebo
 
             // ----------- POSITION -----------
 
-
             // Apply the P-controller to the position of the joints.
-            /*
             for (const auto& joint: joints)
+            {
+              // set joint to PID controller
               this->model->GetJointController()->SetPositionPID(
                   joint->GetScopedName(), this->pid);
-            */
+              // initialize the joint position
+              this->model->GetJointController()->SetPositionTarget(
+                  joint->GetScopedName(), 0);
+            }
+
 
 
             // ----------- VELOCITY -----------
 
             // Apply the P-controller to the velocity of the joints.
             for (const auto& joint: this->joints)
+            {
               this->model->GetJointController()->SetVelocityPID(
                   joint->GetScopedName(), this->pid);
+              // initialize the joint velocity
+              this->model->GetJointController()->SetVelocityTarget(
+                  joint->GetScopedName(), 0);
+            }
 
-            this->SetVelocity(0);
+
+            // ----------- ROS TRANSPORT -----------
+
+            // Initialize ROS, if it has not already been initialized.
+            if (!ros::isInitialized())
+            {
+             int argc = 0;
+             char **argv = NULL;
+             ros::init(argc, argv, "gazebo_client",
+                 ros::init_options::NoSigintHandler);
+            }
+            else
+              std::cout << "ROS is initialized" << "\n";
 
 
-            // ----------- TRANSPORT -----------
+            // Create our ROS node. This acts in a similar manner to
+            // the Gazebo node
+            this->rosNode.reset(new ros::NodeHandle("gazebo_client"));
 
-            // Create the node
-            this->node = transport::NodePtr(new transport::Node());
-            #if GAZEBO_MAJOR_VERSION < 8
-            this->node->Init(this->model->GetWorld()->GetName());
-            #else
-            this->node->Init(this->model->GetWorld()->Name());
-            #endif
+            // Create a named topic, and subscribe to it.
+            ros::SubscribeOptions so =
+              ros::SubscribeOptions::create<std_msgs::Float32>(
+                "/" + this->model->GetName() + "/vel_cmd",
+                 1,
+                 boost::bind(&StewartPlugin::OnRosMsg, this, _1),
+                 ros::VoidPtr(), &this->rosQueue);
+            this->rosSub = this->rosNode->subscribe(so);
 
-            // Create a topic name
-            std::string topicName = "~/" + _model->GetName() + "/vel_cmd";
-
-            // Subscribe to the topic, and register a callback
-            this->sub = this->node->Subscribe(topicName,
-               &StewartPlugin::OnMsg, this);
+           // Spin up the queue helper thread.
+           this->rosQueueThread =
+             std::thread(std::bind(&StewartPlugin::QueueThread, this));
         }
 
 
-        /// \brief Set the position of all the joints
-        /// \param[in] _pos New target position
-        public: void SetPosition(const double &_pos)
+        /// \brief Handle an incoming message from ROS
+        /// \param[in] _msg A float value that is used to set the velocity
+        /// of the joints.
+        public: void OnRosMsg(const std_msgs::Float32ConstPtr &_msg)
         {
-          // Set the joint's target position.
-          for (const auto& joint: this->joints)
-            this->model->GetJointController()->SetPositionPID(
-                joint->GetScopedName(), _pos);
+          this->SetVelocity(_msg->data);
+        }
+
+
+        /// \brief ROS helper function that processes messages
+        private: void QueueThread()
+        {
+          static const double timeout = 0.01;
+          while (this->rosNode->ok())
+          {
+            this->rosQueue.callAvailable(ros::WallDuration(timeout));
+          }
         }
 
 
@@ -101,17 +136,8 @@ namespace gazebo
         {
           // Set the joint's target velocity.
           for (const auto& joint: this->joints)
-            this->model->GetJointController()->SetVelocityPID(
+            this->model->GetJointController()->SetVelocityTarget(
                 joint->GetScopedName(), _vel);
-        }
-
-
-        /// \brief Handle incoming message
-        /// \param[in] _msg Repurpose a vector3 message. This function will
-        /// only use the x component.
-        private: void OnMsg(ConstVector3dPtr &_msg)
-        {
-          this->SetVelocity(_msg->x());
         }
 
 
@@ -127,13 +153,19 @@ namespace gazebo
         private: common::PID pid;
 
 
-        // ----------- GAZEBO TRANSPORT -----------
+        // ----------- ROS TRANSPORT -----------
 
-        /// \brief A node used for transport
-        private: transport::NodePtr node;
+        /// \brief A node use for ROS transport
+        private: std::unique_ptr<ros::NodeHandle> rosNode;
 
-        /// \brief A subscriber to a named topic.
-        private: transport::SubscriberPtr sub;
+        /// \brief A ROS subscriber
+        private: ros::Subscriber rosSub;
+
+        /// \brief A ROS callbackqueue that helps process messages
+        private: ros::CallbackQueue rosQueue;
+
+        /// \brief A thread the keeps running the rosQueue
+        private: std::thread rosQueueThread;
     };
 
 
