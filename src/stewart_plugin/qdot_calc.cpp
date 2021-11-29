@@ -1,7 +1,7 @@
 #include <cmath>
 #include "eigen3/Eigen/Core"
 #include "std_msgs/Float32MultiArray.h"
-
+#include "qdot_calc.h"
 
 Eigen::Matrix<float, 4, 4> transformation_matrix_q_dot(float x, float y, float z, float r, float p, float yaw)
 {
@@ -26,19 +26,19 @@ Eigen::Matrix<float, 6, 1> q_dot(const std_msgs::Float32MultiArray::ConstPtr& cu
         Eigen::Matrix<float, 6, 4> b, p;
 
 
-        b << -0.101,    0.8, 0.25, 1,
-              0.101,    0.8, 0.25, 1,
-              0.743, -0.313, 0.25, 1,
-              0.642, -0.487, 0.25, 1,
-             -0.643, -0.486, 0.25, 1,
-             -0.744, -0.311, 0.25, 1;
-
-        p << -0.642,  0.487, -0.05, 1,
-              0.642,  0.487, -0.05, 1,
-              0.743,  0.313, -0.05, 1,
-              0.101,   -0.8, -0.05, 1,
-             -0.101,   -0.8, -0.05, 1,
-             -0.743,  0.313, -0.05, 1;
+//        b << -0.101,    0.8, 0.25, 1,
+//              0.101,    0.8, 0.25, 1,
+//              0.743, -0.313, 0.25, 1,
+//              0.642, -0.487, 0.25, 1,
+//             -0.643, -0.486, 0.25, 1,
+//             -0.744, -0.311, 0.25, 1;
+//
+//        p << -0.642,  0.487, -0.05, 1,
+//              0.642,  0.487, -0.05, 1,
+//              0.743,  0.313, -0.05, 1,
+//              0.101,   -0.8, -0.05, 1,
+//             -0.101,   -0.8, -0.05, 1,
+//             -0.743,  0.313, -0.05, 1;
 
 	// Retrieving information from message
         float x = currentPos->data[0];
