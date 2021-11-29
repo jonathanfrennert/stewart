@@ -44,7 +44,7 @@ Eigen::Matrix<float, 6, 1> ik(const std_msgs::Float32MultiArray::ConstPtr& goalP
         float roll = goalPos->data[3];
         float pitch = goalPos->data[4];
         float yaw = goalPos->data[5];
-        Eigen::Matrix<float, 4, 4> T = transformation_matrix(x, y, z + height, roll, pitch, yaw);
+        Eigen::Matrix<float, 4, 4> T = transformation_matrix(x, y, z, roll, pitch, yaw);
         for (size_t i = 0; i < 6; i++)
         {
             Eigen::Matrix<float, 4, 1> length = T*p.row(i).transpose() - b.row(i).transpose();
