@@ -149,7 +149,14 @@ namespace gazebo
 
         // ----------- WORLD -----------
 
+        /// \brief initial PC time of simulation
         private: double startTime;
+
+        /// \brief index of segments
+        //private: int index;
+
+        /// \brief Spline segments
+        //private: std::vector<Spline> segments;
 
         // ----------- MODEL -----------
 
