@@ -120,7 +120,7 @@ namespace gazebo
           double timeNow = common::Time::GetWallTime().Double();
           double elapsedTime = timeNow - this->startTime;
 
-          printf("Elapsed time is %f\n", elapsedTime);
+          //printf("Elapsed time is %f\n", elapsedTime);
         }
 
 

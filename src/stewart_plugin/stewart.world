@@ -22,5 +22,47 @@
       <plugin name="stewart_control" filename="./libstewart_plugin.so"/>
     </model>
 
+    <model name = "ball">
+			<link name = "ball_link">
+				<pose> 1.1 1.1 2.1 0 0 0 </pose>
+				<inertial>
+					<mass> 100 </mass>
+					<inertia>
+						<ixx> 0.4 </ixx>
+						<ixy> 0.0 </ixy>
+						<ixz> 0.0 </ixz>
+						<iyy> 0.4 </iyy>
+						<iyz> 0.0 </iyz>
+						<izz> 0.4 </izz>
+					</inertia>
+				</inertial>
+				<visual name = "ball_link_visual">
+					<geometry>
+						<sphere>
+							<radius> 0.1 </radius>
+						</sphere>
+					</geometry>
+				</visual>
+				<collision name = "ball_link_collision">
+					<geometry>
+						<sphere>
+							<radius> 0.1 </radius>
+						</sphere>
+					</geometry>
+				</collision>
+			</link>
+
+      <plugin name="ball_control" filename="./libball_plugin.so"/>
+		</model>
+
+
+    <gui fullscreen='0'>
+      <camera name='user_camera'>
+        <pose>13.3338 -10.0027 7.31158 0 0.275643 2.35619</pose>
+        <view_controller>orbit</view_controller>
+        <projection_type>perspective</projection_type>
+      </camera>
+    </gui>
+
   </world>
 </sdf>
