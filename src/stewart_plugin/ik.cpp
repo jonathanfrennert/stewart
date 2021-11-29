@@ -19,7 +19,7 @@ Eigen::Matrix<float, 6, 1> ik(const std_msgs::Float32MultiArray::ConstPtr& goalP
         Eigen::Matrix<float, 1, 6> goalJointPos = {};
         goalJointPos << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 
-        float height = 2.0;
+        float baseLength = 1.929;
         Eigen::Matrix<float, 6, 4> b, p;
 
 
@@ -44,11 +44,11 @@ Eigen::Matrix<float, 6, 1> ik(const std_msgs::Float32MultiArray::ConstPtr& goalP
         float roll = goalPos->data[3];
         float pitch = goalPos->data[4];
         float yaw = goalPos->data[5];
-        Eigen::Matrix<float, 4, 4> T = transformation_matrix(x, y, z + height, roll, pitch, yaw);
+        Eigen::Matrix<float, 4, 4> T = transformation_matrix(x, y, z, roll, pitch, yaw);
         for (size_t i = 0; i < 6; i++)
         {
             Eigen::Matrix<float, 4, 1> length = T*p.row(i).transpose() - b.row(i).transpose();
-            goalJointPos[i] = sqrt(pow(length(0), 2) + pow(length(1), 2) + pow(length(2), 2)) - height;
+            goalJointPos[i] = sqrt(pow(length(0), 2) + pow(length(1), 2) + pow(length(2), 2)) - baseLength;
         }
 
         return goalJointPos;
