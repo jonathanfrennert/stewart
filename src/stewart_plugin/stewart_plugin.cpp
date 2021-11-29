@@ -3,11 +3,14 @@
 
 #include "ik.h"
 
+#include "eigen3/Eigen/Core"
+
 #include <vector>
 #include <thread>
 
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
+#include <gazebo/common/common.hh>
 #include <gazebo/transport/transport.hh>
 #include <gazebo/msgs/msgs.hh>
 
@@ -52,7 +55,6 @@ namespace gazebo
             // Setup a P-controller, with a gain of 0.1.
             //this->pid = common::PID(10, 0, 10);
             this->pid = common::PID(10000.0, 0.1, 100.0);
-
 
             // ----------- POSITION -----------
 
@@ -102,6 +104,23 @@ namespace gazebo
            // Spin up the queue helper thread.
            this->rosQueueThread =
              std::thread(std::bind(&StewartPlugin::QueueThread, this));
+
+           // Listen to the update event. This event is broadcast every
+           // simulation iteration.
+           this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+               std::bind(&StewartPlugin::OnUpdate, this));
+
+           this->startTime = common::Time::GetWallTime().Double();
+        }
+
+
+        // Called by the world update start event
+        public: void OnUpdate()
+        {
+          double timeNow = common::Time::GetWallTime().Double();
+          double elapsedTime = timeNow - this->startTime;
+
+          printf("Elapsed time is %f\n", elapsedTime);
         }
 
 
@@ -128,6 +147,10 @@ namespace gazebo
         }
 
 
+        // ----------- WORLD -----------
+
+        private: double startTime;
+
         // ----------- MODEL -----------
 
         /// \brief Pointer to the model.
@@ -138,6 +161,12 @@ namespace gazebo
 
         /// \brief A PID controller for the joint.
         private: common::PID pid;
+
+
+        // ----------- GAZEBO TRANSPORT ---------
+
+        // Pointer to the update event connection
+        private: event::ConnectionPtr updateConnection;
 
 
         // ----------- ROS TRANSPORT -----------
