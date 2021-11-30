@@ -1,10 +1,13 @@
-# -*- coding: utf-8 -*-
 #!/usr/bin/env python3
 #
 #   Stewart Platform World Events
 #
 #   Publish:   /stewart/position_cmd   /stewart/velocity_cmd
 #
+
+from ik import ikin
+from qdot_calc import q_dot
+
 import rospy
 import numpy as np
 
@@ -23,16 +26,17 @@ class Generator:
         # Create a publisher to send the joint commands.  Add some time
         # for the subscriber to connect.  This isn't necessary, but means
         # we don't start sending messages until someone is listening.
-        self.pub = rospy.Publisher("/stewart/position_cmd", Float32MultiArray, queue_size=10)
+        self.posPub = rospy.Publisher("/stewart/position_cmd", Float32MultiArray, queue_size=10)
+        self.velPub = rospy.Publisher("/stewart/velocity_cmd", Float32MultiArray, queue_size=10)
         rospy.sleep(0.25)
 
 
         # Create the splines (cubic for now, use Goto5() for HW#5P1).
-        pi = np.array([0.0, 0.0, 2.0, 0.0, 0.0, 0.0])
-        pf = np.array([0.275, 0.275, 2.908, 0.0, 0.0, 0.0])
+        pi = np.array([0.0, 0.0, 2.0, 0.0, 0.0, 0.0]).reshape((6,1))
+        pf = np.array([0.275, 0.275, 2.908, 0.0, 0.0, 0.0]).reshape((6,1))
 
-        self.segments = (Goto(pi, pf, 0.75, 'Joint'),
-                         Goto(pf, pi, 0.75, 'Joint'))
+        self.segments = (Goto(pi, pf, 2, 'Joint'),
+                         Goto(pf, pi, 2, 'Joint'))
 
         # Initialize the current segment index and starting time t0.
         self.index = 0
@@ -56,8 +60,11 @@ class Generator:
         (s, sdot) = self.segments[self.index].evaluate(t - self.t0)
 
         # Collect and send the JointState message.
-        cmdmsg = ik(s)
-        self.pub.publish(cmdmsg)
+        posMsg = Float32MultiArray(data=list(ikin(s)))
+        velMsg = Float32MultiArray(data=list(q_dot(s, sdot)))
+
+        self.posPub.publish(posMsg)
+        self.velPub.publish(velMsg)
 
 
 #

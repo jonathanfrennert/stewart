@@ -25,12 +25,10 @@
   </include>
 
   <!-- Behaviour planning -->
-  <!--
   <node pkg ="stewart"
   type="events.py"
   name="events"
-  output="screen">
-  </node>
--->
+  output="screen"
+  required="true"/>
 
 </launch>
