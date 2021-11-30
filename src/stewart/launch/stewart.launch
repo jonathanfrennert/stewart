@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- Gazebo -->
+  <env name="GAZEBO_PLUGIN_PATH" value="${GAZEBO_PLUGIN_PATH}:$(find stewart)/plugins/build" />
+  <env name="GAZEBO_MODEL_PATH" value="${GAZEBO_MODEL_PATH}:$(find stewart)/models" />
+
+  <!-- Simulator -->
+  <arg name = "paused" default = "true"/>
+  <arg name = "use_sim_time" default = "true"/>
+  <arg name = "gui" default = "true"/>
+  <arg name = "headless" default = "false"/>
+  <arg name = "debug" default = "false"/>
+  <arg name = "verbose" default = "true"/>
+
+  <!-- World -->
+  <include file = "$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name = "world_name" value = "$(find stewart)/worlds/stewart.world" />
+    <arg name = "debug" value = "$(arg debug)" />
+    <arg name = "gui" value = "$(arg gui)" />
+    <arg name = "paused" value = "$(arg paused)" />
+    <arg name = "use_sim_time" value = "$(arg use_sim_time)" />
+    <arg name = "headless" value = "$(arg headless)" />
+    <arg name = "verbose" value = "$(arg verbose)" />
+  </include>
+
+  <!-- Behaviour planning -->
+  <!--
+  <node pkg ="stewart"
+  type="events.py"
+  name="events"
+  output="screen">
+  </node>
+-->
+
+</launch>

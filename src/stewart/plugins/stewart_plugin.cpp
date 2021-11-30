@@ -54,7 +54,7 @@ namespace gazebo
 
             // Setup a P-controller, with a gain of 0.1.
             //this->pid = common::PID(10, 0, 10);
-            this->pid = common::PID(10000.0, 0.1, 100.0);
+            this->pid = common::PID(1000.0, 0.1, 100.0);
 
             // ----------- POSITION -----------
 
@@ -109,16 +109,12 @@ namespace gazebo
            // simulation iteration.
            this->updateConnection = event::Events::ConnectWorldUpdateBegin(
                std::bind(&StewartPlugin::OnUpdate, this));
-
-           this->startTime = common::Time::GetWallTime().Double();
         }
 
 
         // Called by the world update start event
         public: void OnUpdate()
         {
-          double timeNow = common::Time::GetWallTime().Double();
-          double elapsedTime = timeNow - this->startTime;
 
           //printf("Elapsed time is %f\n", elapsedTime);
         }
@@ -126,13 +122,21 @@ namespace gazebo
 
         /// \brief Set the velocity of all the joints
         /// \param[in] _vel New target velocity
-        void setPosition(const std_msgs::Float32MultiArray::ConstPtr& msg)
+        void setVelocity(const std_msgs::Float32MultiArray::ConstPtr& msg)
         {
-            Eigen::Matrix<float, 6, 1> goalJointPos = ik(msg);
-
             auto joints_it = std::begin(this->joints);
             for (int i = 0; i < 5; i++)
-                this->model->GetJointController()->SetPositionTarget((*joints_it++)->GetScopedName(), goalJointPos[i]);
+                this->model->GetJointController()->SetVelocityTarget((*joints_it++)->GetScopedName(), msg->data[i]);
+        }
+
+
+        /// \brief Set the velocity of all the joints
+        /// \param[in] _vel New target position
+        void setPosition(const std_msgs::Float32MultiArray::ConstPtr& msg)
+        {
+            auto joints_it = std::begin(this->joints);
+            for (int i = 0; i < 5; i++)
+                this->model->GetJointController()->SetPositionTarget((*joints_it++)->GetScopedName(), msg->data[i]);
         }
 
 
@@ -146,17 +150,6 @@ namespace gazebo
           }
         }
 
-
-        // ----------- WORLD -----------
-
-        /// \brief initial PC time of simulation
-        private: double startTime;
-
-        /// \brief index of segments
-        //private: int index;
-
-        /// \brief Spline segments
-        //private: std::vector<Spline> segments;
 
         // ----------- MODEL -----------
 

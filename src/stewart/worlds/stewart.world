@@ -18,8 +18,9 @@
       <include>
         <uri>model://stewart</uri>
       </include>
-      <!-- Attach the plugin to this model -->
-      <plugin name="stewart_control" filename="./libstewart_plugin.so"/>
+
+      <!-- Listener plugin for joint control -->
+      <plugin name="stewart_control" filename="libstewart_plugin.so"/>
     </model>
 
     <model name = "ball">
@@ -52,7 +53,8 @@
 				</collision>
 			</link>
 
-      <plugin name="ball_control" filename="./libball_plugin.so"/>
+      <!-- Listener plugin for ball velocity -->
+      <plugin name="ball_control" filename="libball_plugin.so"/>
 		</model>
 
 
