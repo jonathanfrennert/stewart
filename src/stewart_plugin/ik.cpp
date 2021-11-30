@@ -15,7 +15,7 @@ Eigen::Matrix<float, 4, 4> transformation_matrix(float x, float y, float z, floa
 
 
 Eigen::Matrix<float, 6, 1> ik(const std_msgs::Float32MultiArray::ConstPtr& goalPos)
-{
+{//
         Eigen::Matrix<float, 1, 6> goalJointPos = {};
         goalJointPos << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 
