@@ -48,7 +48,7 @@ namespace gazebo
             this->posPid = common::PID(1000000, 100000, 50);
 
             // Setup a velocity P-controller (some less extreme tuning)
-            this->velPid = common::PID(25, 1, 0.01);
+            this->velPid = common::PID(10, 1, 0.01);
 
             // ----------- POSITION -----------
 
@@ -152,12 +152,6 @@ namespace gazebo
 
         /// \brief A PID controller for the velocity of the joint.
         private: common::PID velPid;
-
-
-        // ----------- GAZEBO TRANSPORT ---------
-
-        // Pointer to the update event connection
-        private: event::ConnectionPtr updateConnection;
 
 
         // ----------- ROS TRANSPORT -----------

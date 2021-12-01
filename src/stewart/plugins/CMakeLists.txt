@@ -16,6 +16,11 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 add_library(stewart_plugin SHARED stewart_plugin.cpp)
 target_link_libraries(stewart_plugin ${GAZEBO_LIBRARIES} ${roscpp_LIBRARIES})
 
-# Build Ball plugin
-add_library(ball_plugin SHARED ball_plugin.cpp)
-target_link_libraries(ball_plugin ${GAZEBO_LIBRARIES} ${roscpp_LIBRARIES})
+# Build Ball1 plugin
+add_library(ball1_plugin SHARED ball1_plugin.cpp)
+target_link_libraries(ball1_plugin ${GAZEBO_LIBRARIES} ${roscpp_LIBRARIES})
+
+
+# Build Ball2 plugin
+add_library(ball2_plugin SHARED ball2_plugin.cpp)
+target_link_libraries(ball2_plugin ${GAZEBO_LIBRARIES} ${roscpp_LIBRARIES})

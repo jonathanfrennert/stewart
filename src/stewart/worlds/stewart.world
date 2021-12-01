@@ -3,6 +3,7 @@
 
   <world name="default">
 
+
     <!-- A ground plane -->
     <include>
       <uri>model://ground_plane</uri>
@@ -23,11 +24,29 @@
       <plugin name="stewart_control" filename="libstewart_plugin.so"/>
     </model>
 
-    <model name = "ball">
+    <model name = "protect_sphere">
+      <link name = "sphere_link">
+        <pose> 0 0 2 0 0 0 </pose>
+        <visual name = "ball_link_visual">
+          <geometry>
+            <sphere>
+              <radius> 2 </radius>
+            </sphere>
+          </geometry>
+          <transparency>0.7</transparency>
+        </visual>
+        <static>true</static>
+        <gravity>0</gravity>
+      </link>
+
+    </model>
+
+
+    <model name = "ball1">
 			<link name = "ball_link">
-				<pose> 1.1 1.1 2.1 0 0 0 </pose>
+				<pose> 2 0 0 0 0 0 </pose>
 				<inertial>
-					<mass> 100 </mass>
+					<mass> 0.1 </mass>
 					<inertia>
 						<ixx> 0.4 </ixx>
 						<ixy> 0.0 </ixy>
@@ -40,21 +59,56 @@
 				<visual name = "ball_link_visual">
 					<geometry>
 						<sphere>
-							<radius> 0.1 </radius>
+							<radius> 0.15 </radius>
 						</sphere>
 					</geometry>
 				</visual>
 				<collision name = "ball_link_collision">
 					<geometry>
 						<sphere>
-							<radius> 0.1 </radius>
+							<radius> 0.15 </radius>
 						</sphere>
 					</geometry>
 				</collision>
 			</link>
 
       <!-- Listener plugin for ball velocity -->
-      <plugin name="ball_control" filename="libball_plugin.so"/>
+      <plugin name="ball1_control" filename="libball1_plugin.so"/>
+		</model>
+
+
+    <model name = "ball2">
+			<link name = "ball_link">
+				<pose> -2 0 0 0 0 0 </pose>
+				<inertial>
+					<mass> 0.1 </mass>
+					<inertia>
+						<ixx> 0.4 </ixx>
+						<ixy> 0.0 </ixy>
+						<ixz> 0.0 </ixz>
+						<iyy> 0.4 </iyy>
+						<iyz> 0.0 </iyz>
+						<izz> 0.4 </izz>
+					</inertia>
+				</inertial>
+				<visual name = "ball_link_visual">
+					<geometry>
+						<sphere>
+							<radius> 0.15 </radius>
+						</sphere>
+					</geometry>
+				</visual>
+				<collision name = "ball_link_collision">
+					<geometry>
+						<sphere>
+							<radius> 0.15 </radius>
+						</sphere>
+					</geometry>
+				</collision>
+			</link>
+
+      <!-- Listener plugin for ball velocity -->
+      <plugin name="ball2_control" filename="libball2_plugin.so"/>
 		</model>
 
 

@@ -21,7 +21,8 @@ def ikin(goalPos):
     OUTPUT: List
     """
     # All inputs as numpy array NO ROS MESSAGEs
-    base_length = 1.929
+    base_length = 2
+
     b = np.array([[-0.101,    0.8, 0.25, 1],
                   [0.101,    0.8, 0.25, 1],
                   [0.743, -0.313, 0.25, 1],
@@ -35,6 +36,7 @@ def ikin(goalPos):
                   [0.101,   -0.8, -0.05, 1],
                   [-0.101,   -0.8, -0.05, 1],
                   [-0.743,  0.313, -0.05, 1]])
+
 
     # Acquiring from numpy input array
     # Goal position as a column vector pls

@@ -13,14 +13,17 @@ def get_x(p0, v0, R, c):
     t = 0.0
     dt = 0.01
     g = np.array([0.0, 0.0, 9.81]).reshape(3,1)
-
-    while(np.linalg.norm(p - c) > R):
+    while True:
         # x and y velocity are constant, but z velocity changes
         v = v - g*dt
 
         p = p + v*dt
 
         t = t + dt
+
+        if (np.linalg.norm(p - c) < R):
+            print(t)
+            break
 
         if (t > 1000):
             exit()
@@ -29,7 +32,6 @@ def get_x(p0, v0, R, c):
 
     # 0: yaw; 1: pitch; 2: roll
     orientation = np.array([0.0, 0.0, 0.0]).reshape(3,1)
-
     # pitch
     orientation[1] = np.arctan2(-v[0], -v[2])
 

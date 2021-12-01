@@ -5,8 +5,14 @@
 #   Publish:   /stewart/position_cmd   /stewart/velocity_cmd
 #
 
+from time import time
+
 from ik import ikin
 from qdot_calc import q_dot
+
+from gen_positions import gen_positions
+from velocity import init_velocity
+from x_calc import get_x
 
 import rospy
 import numpy as np
@@ -26,15 +32,15 @@ STEWART_PROTECT_RADIUS = 2
 
 # Cartesian coordinate for center of sphere that Stewart platform will aim to stop
 # balls from entering
-STEWART_PROTECT_CENTER = np.array([0.0, 0.0, 2.0]).reshape(3,1)
+STEWART_PROTECT_CENTER = np.array([0.0, 0.0, 2.5]).reshape(3,1)
 
 # Time (in seconds) at which the first ball will hit the center of the sphere that the Stewart platform
 # is protecting
-BALL1_T = 2
+BALL1_T = 0.7
 
 # Time (in seconds) at which the first ball will hit the center of the sphere that the Stewart platform
 # is protecting
-BALL2_T = 4
+BALL2_T = 2
 
 
 #
@@ -52,33 +58,42 @@ class Generator:
         rospy.sleep(0.25)
 
         # random position of 2 balls that stewart platform will aim to protect against
-        #ball1_init_pos =
-        #ball2_init_pos =
+        ball1_init_pos, ball2_init_pos = gen_positions(6, 3, 6, 2)
 
         # initial velocities of balls such that they will hit the center of the sphere
         # that the Stewart platform is trying to protect in BALL1_T and BALL2_T seconds
-        #ball1_init_vel =
-        #ball2_init_vel =
+        ball1_init_vel = init_velocity(ball1_init_pos, STEWART_PROTECT_CENTER, BALL1_T)
+        ball2_init_vel = init_velocity(ball2_init_pos, STEWART_PROTECT_CENTER, BALL2_T)
 
 
         # Set initial position and velocities of balls
-        #ball1Data = list(ball1_init_pos) + list(ball1_init_vel)
-        #ball1Msg = Float32MultiArray(data=ball1Data)
-        #self.pubBall1.publish(ball1Msg)
+        ball1Data = list(ball1_init_pos) + list(ball1_init_vel)
+        ball1Msg = Float32MultiArray(data=ball1Data)
+        self.pubBall1.publish(ball1Msg)
 
-        #ball2Data =  list(ball2_init_pos) + list(ball2_init_vel)
-        #ball2Msg = Float32MultiArray(data=ball2Data)
-        #self.pubBall2.publish(ball2Msg)
+        ball2Data =  list(ball2_init_pos) + list(ball2_init_vel)
+        ball2Msg = Float32MultiArray(data=ball2Data)
+        self.pubBall2.publish(ball2Msg)
+
+        calc_delay = time()
 
         # Points of intersection of ball trajectories and sphere which Stewart platform is protecting
-        #stewart_ball1_meet, time_meet1 = x_calc(ball1_init_pos, ball1_init_vel,  STEWART_PROTECT_RADIUS, STEWART_PROTECT_CENTER)
-        stewart_ball1_meet, time_meet1 = np.array([1.0,0.0,3.0,0.0,-0.9,0.0]).reshape(6,1), 2
-        #stewart_ball2_meet, time_meet2 = x_calc(ball2_init_pos, ball1_init_vel, STEWART_PROTECT_RADIUS, STEWART_PROTECT_CENTER)
-        stewart_ball2_meet, time_meet2 = np.array([0.0,1.0,3.0,0.0,0.9,0.0]).reshape(6,1), 2
+        stewart_ball1_meet, time_meet1 = get_x(ball1_init_pos, ball1_init_vel,  STEWART_PROTECT_RADIUS+0.4, STEWART_PROTECT_CENTER)
+        stewart_ball2_meet, time_meet2 = get_x(ball2_init_pos, ball2_init_vel, STEWART_PROTECT_RADIUS+0.4, STEWART_PROTECT_CENTER)
 
-        self.segments = (Goto(STEWART_INIT_CONFIG, stewart_ball1_meet, time_meet1, 'Joint'),
-                         Goto(stewart_ball1_meet, stewart_ball2_meet, time_meet2, 'Joint'),
-                         Goto(stewart_ball2_meet, STEWART_INIT_CONFIG, 1, 'Joint'))
+        calc_delay = calc_delay - time()
+
+        self.segments = (Goto(STEWART_INIT_CONFIG, stewart_ball1_meet, time_meet1 + calc_delay, 'Joint'),
+                         Goto(stewart_ball1_meet, STEWART_INIT_CONFIG,  (time_meet2 - time_meet1) / 2, 'Joint'),
+                         Goto(STEWART_INIT_CONFIG, stewart_ball2_meet, (time_meet2 - time_meet1) / 2, 'Joint'),
+                         Goto(stewart_ball2_meet, STEWART_INIT_CONFIG, 1, 'Joint'),
+                         Hold(STEWART_INIT_CONFIG, 100, 'Joint'))
+
+        #test_pos = np.array([0.0,1.0,2.0, 0.0, 0.0, 0.0]).reshape(6,1)
+
+        #self.segments = (Hold(STEWART_INIT_CONFIG, 1, 'Joint'),
+        #                 Goto(STEWART_INIT_CONFIG, test_pos, 2, 'Joint'),
+        #                 Hold(test_pos, 2, 'Joint'))
 
         # Initialize the current segment index and starting time t0.
         self.index = 0

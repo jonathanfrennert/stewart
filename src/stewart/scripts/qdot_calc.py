@@ -22,7 +22,7 @@ def q_dot(currentPos, currentVel):
     """
 
     # Verifying b and p
-    base_length = 1.929
+    base_length = 2
     b = np.array([[-0.101,    0.8, 0.25, 1],
                   [0.101,    0.8, 0.25, 1],
                   [0.743, -0.313, 0.25, 1],
