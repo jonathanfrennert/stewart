@@ -26,8 +26,7 @@ class Generator:
         # Create a publisher to send the joint commands.  Add some time
         # for the subscriber to connect.  This isn't necessary, but means
         # we don't start sending messages until someone is listening.
-        self.posPub = rospy.Publisher("/stewart/position_cmd", Float32MultiArray, queue_size=10)
-        self.velPub = rospy.Publisher("/stewart/velocity_cmd", Float32MultiArray, queue_size=10)
+        self.pub = rospy.Publisher("/stewart/position_velocity_cmd", Float32MultiArray, queue_size=10)
         rospy.sleep(0.25)
 
 
@@ -61,11 +60,9 @@ class Generator:
         (s, sdot) = self.segments[self.index].evaluate(t - self.t0)
 
         # Collect and send the JointState message.
-        posMsg = Float32MultiArray(data=list(ikin(s)))
-        velMsg = Float32MultiArray(data=list(q_dot(s, sdot)))
-
-        self.posPub.publish(posMsg)
-        self.velPub.publish(velMsg)
+        posVelData = list(ikin(s)) + list(q_dot(s, sdot))
+        rosMsg = Float32MultiArray(data=posVelData)
+        self.pub.publish(rosMsg)
 
 
 #

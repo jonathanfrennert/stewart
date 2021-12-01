@@ -1,23 +1,16 @@
 #ifndef _STEWART_PLUGIN_HH_
 #define _STEWART_PLUGIN_HH_
 
-#include "ik.h"
-
-#include "eigen3/Eigen/Core"
-
 #include <vector>
 #include <thread>
 
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
 #include <gazebo/common/common.hh>
-#include <gazebo/transport/transport.hh>
-#include <gazebo/msgs/msgs.hh>
 
 #include "ros/ros.h"
 #include "ros/callback_queue.h"
 #include "ros/subscribe_options.h"
-#include "std_msgs/Float32.h"
 #include "std_msgs/Float32MultiArray.h"
 
 
@@ -43,26 +36,27 @@ namespace gazebo
               return;
             }
             else
-              std::cout << "\nThe Stewart plugin is attached to model[" << _model->GetName() << "]\n";
+              std::cout << "\nSTEWART PLUGIN: The Stewart plugin is attached to model[" << _model->GetName() << "]\n\n";
 
             // Store the model pointer for convenience.
             this->model = _model;
 
-            // Get the first joint. We are making an assumption about the model
-            // having one joint that is the rotational joint.
+            // Get the joints.
             this->joints = _model->GetJoints();
 
-            // Setup a P-controller (some extreme tuning)
-            this->pid = common::PID(1000000, 100000, 50);
+            // Setup a position P-controller (some extreme tuning)
+            this->posPid = common::PID(1000000, 100000, 50);
+
+            // Setup a velocity P-controller (some less extreme tuning)
+            this->velPid = common::PID(25, 1, 0.01);
 
             // ----------- POSITION -----------
 
             // Apply the P-controller to the position of the joints.
             for (const auto& joint: this->joints)
             {
-              // set joint to PID controller
               this->model->GetJointController()->SetPositionPID(
-                  joint->GetScopedName(), this->pid);
+                  joint->GetScopedName(), this->posPid);
             }
 
 
@@ -72,7 +66,7 @@ namespace gazebo
             for (const auto& joint: this->joints)
             {
               this->model->GetJointController()->SetVelocityPID(
-                  joint->GetScopedName(), this->pid);
+                  joint->GetScopedName(), this->velPid);
             }
 
 
@@ -86,36 +80,41 @@ namespace gazebo
              ros::init(argc, argv, "gazebo_client",
                  ros::init_options::NoSigintHandler);
             }
-            std::cout << "ROS is initialized" << "\n";
+            std::cout << "STEWART PLUGIN: ROS is initialized" << "\n\n";
 
             // Create our ROS node. This acts in a similar manner to
             // the Gazebo node
             this->rosNode.reset(new ros::NodeHandle("gazebo_client"));
 
-            // Create a named topic, and subscribe to it.
+            // Create a named topic for the position and velocity, and subscribe to it.
             ros::SubscribeOptions so = ros::SubscribeOptions::create<std_msgs::Float32MultiArray>(
-                "/" + this->model->GetName() + "/position_cmd",
+                "/" + this->model->GetName() + "/position_velocity_cmd",
                 100,
-                boost::bind(&StewartPlugin::setPosition, this, _1),
+                boost::bind(&StewartPlugin::OnRosMsg, this, _1),
                 ros::VoidPtr(), &this->rosQueue);
             this->rosSub = this->rosNode->subscribe(so);
 
            // Spin up the queue helper thread.
            this->rosQueueThread =
              std::thread(std::bind(&StewartPlugin::QueueThread, this));
-
-           // Listen to the update event. This event is broadcast every
-           // simulation iteration.
-           this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-               std::bind(&StewartPlugin::OnUpdate, this));
         }
 
-
-        // Called by the world update start event
-        public: void OnUpdate()
+        /// \brief Handle an incoming message from ROS
+        /// \param[in] _msg A float value that is used to set the position and
+        /// velocity of the stewart platform
+        void OnRosMsg(const std_msgs::Float32MultiArray::ConstPtr& msg)
         {
+          this->setPosition(msg);
+          this->setVelocity(msg);
+        }
 
-          //printf("Elapsed time is %f\n", elapsedTime);
+        /// \brief Set the position of all the joints
+        /// \param[in] _vel New target position
+        void setPosition(const std_msgs::Float32MultiArray::ConstPtr& msg)
+        {
+            auto joints_it = std::begin(this->joints);
+            for (int i = 0; i < 5; i++)
+                this->model->GetJointController()->SetPositionTarget((*joints_it++)->GetScopedName(), msg->data[i]);
         }
 
 
@@ -124,18 +123,8 @@ namespace gazebo
         void setVelocity(const std_msgs::Float32MultiArray::ConstPtr& msg)
         {
             auto joints_it = std::begin(this->joints);
-            for (int i = 0; i < 5; i++)
+            for (int i = 6; i < 11; i++)
                 this->model->GetJointController()->SetVelocityTarget((*joints_it++)->GetScopedName(), msg->data[i]);
-        }
-
-
-        /// \brief Set the velocity of all the joints
-        /// \param[in] _vel New target position
-        void setPosition(const std_msgs::Float32MultiArray::ConstPtr& msg)
-        {
-            auto joints_it = std::begin(this->joints);
-            for (int i = 0; i < 5; i++)
-                this->model->GetJointController()->SetPositionTarget((*joints_it++)->GetScopedName(), msg->data[i]);
         }
 
 
@@ -158,8 +147,11 @@ namespace gazebo
         /// \brief Pointer to the joints.
         private: std::vector<physics::JointPtr> joints;
 
-        /// \brief A PID controller for the joint.
-        private: common::PID pid;
+        /// \brief A PID controller for the position of the joint.
+        private: common::PID posPid;
+
+        /// \brief A PID controller for the velocity of the joint.
+        private: common::PID velPid;
 
 
         // ----------- GAZEBO TRANSPORT ---------

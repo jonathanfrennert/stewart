@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <sdf version="1.5">
 
+<!-- Modified so that inertial and mass property removed from all but base link. -->
+
 <model name = "stewart">
 
 	<joint name = "piston1_prismatic_joint" type = "prismatic" >

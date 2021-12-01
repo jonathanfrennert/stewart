@@ -13,9 +13,8 @@ link_directories(${GAZEBO_LIBRARY_DIRS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 
 # Build Stewart plugin
-add_library(stewart_plugin SHARED stewart_plugin.cpp ik.cpp)
+add_library(stewart_plugin SHARED stewart_plugin.cpp)
 target_link_libraries(stewart_plugin ${GAZEBO_LIBRARIES} ${roscpp_LIBRARIES})
-
 
 # Build Ball plugin
 add_library(ball_plugin SHARED ball_plugin.cpp)
