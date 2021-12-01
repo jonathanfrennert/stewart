@@ -24,8 +24,8 @@ def get_x(p0, v0, R, c):
 
         t = t + dt
         
-        if (t > 10):
-            return "Ball either does not intersect or took too long to intersect."
+        if (t > 1000):
+            exit()
 
     # Equations from: Rotz*Roty*Rotx*[0,0,1]^T = - v/norm(v), with thetaz = roll = 0
 
@@ -41,12 +41,3 @@ def get_x(p0, v0, R, c):
     x = np.vstack((p, orientation))
 
     return (x,t)
-
-p0 = np.array([2, 0, 0]).reshape(3,1)
-pf = np.array([0, 0, 3]).reshape(3,1)
-t = 2.0
-v0 = np.array([(pf[0]-p0[0])/t, (pf[1]-p0[1])/t, (pf[0]-p0[0] + 0.5*9.81*t**2)/t]).reshape(3,1)
-R = 1
-c = np.array([0, 0, 2]).reshape(3,1)
-
-print(get_x(p0, v0, R, c))
