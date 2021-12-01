@@ -17,6 +17,26 @@ from std_msgs.msg import Float32MultiArray
 from splines import  CubicSpline, Goto, Hold, Stay, QuinticSpline, Goto5
 
 
+
+# Initial position and velocities of Stewart platform joints
+STEWART_INIT_CONFIG = np.array([0.0, 0.0, 2.0, 0.0, 0.0, 0.0]).reshape(6,1)
+
+# Radius of sphere that Stewart platform will aim to stop balls from entering
+STEWART_PROTECT_RADIUS = 2
+
+# Cartesian coordinate for center of sphere that Stewart platform will aim to stop
+# balls from entering
+STEWART_PROTECT_CENTER = np.array([0.0, 0.0, 2.0]).reshape(3,1)
+
+# Time (in seconds) at which the first ball will hit the center of the sphere that the Stewart platform
+# is protecting
+BALL1_T = 2
+
+# Time (in seconds) at which the first ball will hit the center of the sphere that the Stewart platform
+# is protecting
+BALL2_T = 4
+
+
 #
 #  Generator Class
 #
@@ -26,17 +46,39 @@ class Generator:
         # Create a publisher to send the joint commands.  Add some time
         # for the subscriber to connect.  This isn't necessary, but means
         # we don't start sending messages until someone is listening.
-        self.pub = rospy.Publisher("/stewart/position_velocity_cmd", Float32MultiArray, queue_size=10)
+        self.pubStewart = rospy.Publisher("/stewart/position_velocity_cmd", Float32MultiArray, queue_size=10)
+        self.pubBall1 = rospy.Publisher("/ball1/position_velocity_cmd", Float32MultiArray, queue_size=10)
+        self.pubBall2 = rospy.Publisher("/ball2/position_velocity_cmd", Float32MultiArray, queue_size=10)
         rospy.sleep(0.25)
 
+        # random position of 2 balls that stewart platform will aim to protect against
+        #ball1_init_pos =
+        #ball2_init_pos =
 
-        # Create the splines (cubic for now, use Goto5() for HW#5P1).
-        pi = np.array([0.0, 0.0, 2.0, 0.0, 0.0, 0.0]).reshape((6,1))
-        pf = np.array([1.0, 0, 2.9, 0.0, 0.9, 0.0]).reshape((6,1))
+        # initial velocities of balls such that they will hit the center of the sphere
+        # that the Stewart platform is trying to protect in BALL1_T and BALL2_T seconds
+        #ball1_init_vel =
+        #ball2_init_vel =
 
-        self.segments = (Goto(pi, pf, 0.75, 'Joint'),
-                         Hold(pf, 1, 'Joint'),
-                         Goto(pf, pi, 0.75, 'Joint'))
+
+        # Set initial position and velocities of balls
+        #ball1Data = list(ball1_init_pos) + list(ball1_init_vel)
+        #ball1Msg = Float32MultiArray(data=ball1Data)
+        #self.pubBall1.publish(ball1Msg)
+
+        #ball2Data =  list(ball2_init_pos) + list(ball2_init_vel)
+        #ball2Msg = Float32MultiArray(data=ball2Data)
+        #self.pubBall2.publish(ball2Msg)
+
+        # Points of intersection of ball trajectories and sphere which Stewart platform is protecting
+        #stewart_ball1_meet, time_meet1 = x_calc(ball1_init_pos, ball1_init_vel,  STEWART_PROTECT_RADIUS, STEWART_PROTECT_CENTER)
+        stewart_ball1_meet, time_meet1 = np.array([1.0,0.0,3.0,0.0,-0.9,0.0]).reshape(6,1), 2
+        #stewart_ball2_meet, time_meet2 = x_calc(ball2_init_pos, ball1_init_vel, STEWART_PROTECT_RADIUS, STEWART_PROTECT_CENTER)
+        stewart_ball2_meet, time_meet2 = np.array([0.0,1.0,3.0,0.0,0.9,0.0]).reshape(6,1), 2
+
+        self.segments = (Goto(STEWART_INIT_CONFIG, stewart_ball1_meet, time_meet1, 'Joint'),
+                         Goto(stewart_ball1_meet, stewart_ball2_meet, time_meet2, 'Joint'),
+                         Goto(stewart_ball2_meet, STEWART_INIT_CONFIG, 1, 'Joint'))
 
         # Initialize the current segment index and starting time t0.
         self.index = 0
@@ -49,8 +91,8 @@ class Generator:
         dur = self.segments[self.index].duration()
         if (t - self.t0 >= dur):
             self.t0    = (self.t0 + dur)
-            #self.index = (self.index + 1)                       # not cyclic!
-            self.index = (self.index + 1) % len(self.segments)  # cyclic!
+            self.index = (self.index + 1)  # not cyclic!
+            #self.index = (self.index + 1) % len(self.segments)  # cyclic!
 
         # Check whether we are done with all segments.
         if (self.index >= len(self.segments)):
@@ -62,7 +104,7 @@ class Generator:
         # Collect and send the JointState message.
         posVelData = list(ikin(s)) + list(q_dot(s, sdot))
         rosMsg = Float32MultiArray(data=posVelData)
-        self.pub.publish(rosMsg)
+        self.pubStewart.publish(rosMsg)
 
 
 #
