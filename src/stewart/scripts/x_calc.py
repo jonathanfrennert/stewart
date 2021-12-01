@@ -1,6 +1,4 @@
 import numpy as np
-import sys
-import os
 
 # Expecting np.arrays for p0, v0, and c;
 def get_x(p0, v0, R, c):
