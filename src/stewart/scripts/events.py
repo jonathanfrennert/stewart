@@ -33,10 +33,11 @@ class Generator:
 
         # Create the splines (cubic for now, use Goto5() for HW#5P1).
         pi = np.array([0.0, 0.0, 2.0, 0.0, 0.0, 0.0]).reshape((6,1))
-        pf = np.array([0.275, 0.275, 2.908, 0.0, 0.0, 0.0]).reshape((6,1))
+        pf = np.array([1.0, 0, 2.9, 0.0, 0.9, 0.0]).reshape((6,1))
 
-        self.segments = (Goto(pi, pf, 2, 'Joint'),
-                         Goto(pf, pi, 2, 'Joint'))
+        self.segments = (Goto(pi, pf, 0.75, 'Joint'),
+                         Hold(pf, 1, 'Joint'),
+                         Goto(pf, pi, 0.75, 'Joint'))
 
         # Initialize the current segment index and starting time t0.
         self.index = 0

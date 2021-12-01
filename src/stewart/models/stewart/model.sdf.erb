@@ -3,7 +3,7 @@
 <%
 	BASE_HEIGHT = 0.25
 	BASE_RADIUS = 1.0
-	BASE_MASS = 1000.0
+	BASE_MASS = 100000.0
 
 	PLATFORM_HEIGHT = 0.1
 	PLATFORM_RADIUS = BASE_RADIUS
@@ -12,7 +12,7 @@
 	BALL_RADIUS = 0.1
 
 	BASE_PLATFORM_DISTANCE = 2
-	
+
 	PISTON_RADIUS = BALL_RADIUS
 
 	BALL_DTC = Math.sqrt(BASE_RADIUS**2-4*BASE_RADIUS*BALL_RADIUS+5*BALL_RADIUS**2)
@@ -23,9 +23,8 @@
 	PISTON_YAW_ANGLE = 1.571-(0.5*(3.142-(1.047-2*Math.asin(BALL_RADIUS/(BASE_RADIUS-2*BALL_RADIUS))))-Math.asin(BALL_RADIUS/(BASE_RADIUS-2*BALL_RADIUS)))
 
 	PISTON_LENGTH = Math.sqrt((BASE_PLATFORM_DISTANCE-0.5*BASE_HEIGHT-0.5*PLATFORM_HEIGHT)**2+BALL_SEPARATION**2)
-%>								
+%>
 <model name = "stewart">
-	<plugin name="joint_controller" filename="libjoint_controller.so"/>
 
 	<joint name = "piston1_prismatic_joint" type = "prismatic" >
 		<parent> piston1_cylinder_link </parent>
@@ -45,7 +44,7 @@
 		<parent> piston2_cylinder_link </parent>
 		<child> piston2_shaft_link </child>
 		<pose> 0 0 0 0 0 0 </pose>
-		<axis> 
+		<axis>
 			<xyz> 0 0 1 </xyz>
 			<limit>
 				<lower> 0 </lower>
@@ -73,7 +72,7 @@
 		<parent> piston4_cylinder_link </parent>
 		<child> piston4_shaft_link </child>
 		<pose> 0 0 0 0 0 0 </pose>
-		<axis> 
+		<axis>
 			<xyz> 0 0 1 </xyz>
 			<limit>
 				<lower> 0 </lower>
@@ -87,7 +86,7 @@
 		<parent> piston5_cylinder_link </parent>
 		<child> piston5_shaft_link </child>
 		<pose> 0 0 0 0 0 0 </pose>
-		<axis> 
+		<axis>
 			<xyz> 0 0 1 </xyz>
 			<limit>
 				<lower> 0 </lower>
@@ -101,7 +100,7 @@
 		<parent> piston6_cylinder_link </parent>
 		<child> piston6_shaft_link </child>
 		<pose> 0 0 0 0 0 0 </pose>
-		<axis> 
+		<axis>
 			<xyz> 0 0 1 </xyz>
 			<limit>
 				<lower> 0 </lower>
@@ -115,7 +114,7 @@
 		<parent> base_link </parent>
 		<child> bottom_ball1_link </child>
 		<pose> 0 0 0 0 0 0 </pose>
-		<axis> 
+		<axis>
 			<xyz> 0 1 0 </xyz>
 			<limit>
 				<lower> -0.786 </lower>
@@ -129,7 +128,7 @@
 		<parent> base_link </parent>
 		<child> bottom_ball2_link </child>
 		<pose> 0 0 0 0 0 0 </pose>
-		<axis> 
+		<axis>
 			<xyz> 0 1 0 </xyz>
 			<limit>
 				<lower> -0.786 </lower>
@@ -143,7 +142,7 @@
 		<parent> base_link </parent>
 		<child> bottom_ball3_link </child>
 		<pose> 0 0 0 0 0 0 </pose>
-		<axis> 
+		<axis>
 			<xyz> 0 1 0 </xyz>
 			<limit>
 				<lower> -0.786 </lower>
@@ -157,7 +156,7 @@
 		<parent> base_link </parent>
 		<child> bottom_ball4_link </child>
 		<pose> 0 0 0 0 0 0 </pose>
-		<axis> 
+		<axis>
 			<xyz> 0 1 0 </xyz>
 			<limit>
 				<lower> -0.786 </lower>
@@ -171,7 +170,7 @@
 		<parent> base_link </parent>
 		<child> bottom_ball5_link </child>
 		<pose> 0 0 0 0 0 0 </pose>
-		<axis> 
+		<axis>
 			<xyz> 0 1 0 </xyz>
 			<limit>
 				<lower> -0.786 </lower>
@@ -185,7 +184,7 @@
 		<parent> base_link </parent>
 		<child> bottom_ball6_link </child>
 		<pose> 0 0 0 0 0 0 </pose>
-		<axis> 
+		<axis>
 			<xyz> 0 1 0 </xyz>
 			<limit>
 				<lower> -0.786 </lower>
@@ -199,7 +198,7 @@
 		<parent> platform_link </parent>
 		<child> top_ball1_link </child>
 		<pose> 0 0 0 0 0 0 </pose>
-		<axis> 
+		<axis>
 			<xyz> 0 1 0 </xyz>
 			<limit>
 				<lower> -0.786 </lower>
@@ -207,7 +206,7 @@
 				<velocity> 0.1 </velocity>
 			</limit>
 		</axis>
-		<axis2> 
+		<axis2>
 			<xyz> 0 0 1 </xyz>
 			<limit>
 				<lower> -0.786 </lower>
@@ -221,7 +220,7 @@
 		<parent> platform_link </parent>
 		<child> top_ball2_link </child>
 		<pose> 0 0 0 0 0 0 </pose>
-		<axis> 
+		<axis>
 			<xyz> 0 1 0 </xyz>
 			<limit>
 				<lower> -0.786 </lower>
@@ -229,7 +228,7 @@
 				<velocity> 0.1 </velocity>
 			</limit>
 		</axis>
-		<axis2> 
+		<axis2>
 			<xyz> 0 0 1 </xyz>
 			<limit>
 				<lower> -0.786 </lower>
@@ -243,7 +242,7 @@
 		<parent> platform_link </parent>
 		<child> top_ball3_link </child>
 		<pose> 0 0 0 0 0 0 </pose>
-		<axis> 
+		<axis>
 			<xyz> 0 1 0 </xyz>
 			<limit>
 				<lower> -0.786 </lower>
@@ -251,7 +250,7 @@
 				<velocity> 0.1 </velocity>
 			</limit>
 		</axis>
-		<axis2> 
+		<axis2>
 			<xyz> 0 0 1 </xyz>
 			<limit>
 				<lower> -0.786 </lower>
@@ -265,7 +264,7 @@
 		<parent> platform_link </parent>
 		<child> top_ball4_link </child>
 		<pose> 0 0 0 0 0 0 </pose>
-		<axis> 
+		<axis>
 			<xyz> 0 1 0 </xyz>
 			<limit>
 				<lower> -0.786 </lower>
@@ -273,7 +272,7 @@
 				<velocity> 0.1 </velocity>
 			</limit>
 		</axis>
-		<axis2> 
+		<axis2>
 			<xyz> 0 0 1 </xyz>
 			<limit>
 				<lower> -0.786 </lower>
@@ -287,7 +286,7 @@
 		<parent> platform_link </parent>
 		<child> top_ball5_link </child>
 		<pose> 0 0 0 0 0 0 </pose>
-		<axis> 
+		<axis>
 			<xyz> 0 1 0 </xyz>
 			<limit>
 				<lower> -0.786 </lower>
@@ -295,7 +294,7 @@
 				<velocity> 0.1 </velocity>
 			</limit>
 		</axis>
-		<axis2> 
+		<axis2>
 			<xyz> 0 0 1 </xyz>
 			<limit>
 				<lower> -0.786 </lower>
@@ -309,7 +308,7 @@
 		<parent> platform_link </parent>
 		<child> top_ball6_link </child>
 		<pose> 0 0 0 0 0 0 </pose>
-		<axis> 
+		<axis>
 			<xyz> 0 1 0 </xyz>
 			<limit>
 				<lower> -0.786 </lower>
@@ -317,7 +316,7 @@
 				<velocity> 0.1 </velocity>
 			</limit>
 		</axis>
-		<axis2> 
+		<axis2>
 			<xyz> 0 0 1 </xyz>
 			<limit>
 				<lower> -0.786 </lower>
@@ -331,7 +330,7 @@
 		<parent> bottom_ball1_link </parent>
 		<child> piston1_cylinder_link </child>
 		<pose> 0 0 <%= -0.5*PISTON_LENGTH %> 0 0 0 </pose>
-		<axis> 
+		<axis>
 			<xyz> 1 0 0 </xyz>
 			<limit>
 				<lower> -0.786 </lower>
@@ -344,7 +343,7 @@
 		<parent> bottom_ball2_link </parent>
 		<child> piston2_cylinder_link </child>
 		<pose> 0 0 <%= -0.5*PISTON_LENGTH %> 0 0 0</pose>
-		<axis> 
+		<axis>
 			<xyz> 1 0 0 </xyz>
 			<limit>
 				<lower> -0.786 </lower>
@@ -357,7 +356,7 @@
 		<parent> bottom_ball3_link </parent>
 		<child> piston3_cylinder_link </child>
 		<pose> 0 0 <%= -0.5*PISTON_LENGTH %> 0 0 0 </pose>
-		<axis> 
+		<axis>
 			<xyz> 1 0 0 </xyz>
 			<limit>
 				<lower> -0.786 </lower>
@@ -370,7 +369,7 @@
 		<parent> bottom_ball4_link </parent>
 		<child> piston4_cylinder_link </child>
 		<pose> 0 0 <%= -0.5*PISTON_LENGTH %> 0 0 0 </pose>
-		<axis> 
+		<axis>
 			<xyz> 1 0 0 </xyz>
 			<limit>
 				<lower> -0.786 </lower>
@@ -383,7 +382,7 @@
 		<parent> bottom_ball5_link </parent>
 		<child> piston5_cylinder_link </child>
 		<pose> 0 0 <%= -0.5*PISTON_LENGTH %> 0 0 0 </pose>
-		<axis> 
+		<axis>
 			<xyz> 1 0 0 </xyz>
 			<limit>
 				<lower> -0.786 </lower>
@@ -396,7 +395,7 @@
 		<parent> bottom_ball6_link </parent>
 		<child> piston6_cylinder_link </child>
 		<pose> 0 0 <%= -0.5*PISTON_LENGTH %> 0 0 0 </pose>
-		<axis> 
+		<axis>
 			<xyz> 1 0 0 </xyz>
 			<limit>
 				<lower> -0.786 </lower>
@@ -409,7 +408,7 @@
 		<parent> top_ball1_link </parent>
 		<child> piston1_shaft_link </child>
 		<pose> 0 0 <%= 0.5*PISTON_LENGTH %> 0 0 0 </pose>
-		<axis> 
+		<axis>
 			<xyz> 1 0 0 </xyz>
 			<limit>
 				<lower> -0.786 </lower>
@@ -422,7 +421,7 @@
 		<parent> top_ball2_link </parent>
 		<child> piston2_shaft_link </child>
 		<pose> 0 0 <%= 0.5*PISTON_LENGTH %> 0 0 0</pose>
-		<axis> 
+		<axis>
 			<xyz> 1 0 0 </xyz>
 			<limit>
 				<lower> -0.786 </lower>
@@ -435,7 +434,7 @@
 		<parent> top_ball3_link </parent>
 		<child> piston3_shaft_link </child>
 		<pose> 0 0 <%= 0.5*PISTON_LENGTH %> 0 0 0 </pose>
-		<axis> 
+		<axis>
 			<xyz> 1 0 0 </xyz>
 			<limit>
 				<lower> -0.786 </lower>
@@ -448,7 +447,7 @@
 		<parent> top_ball4_link </parent>
 		<child> piston4_shaft_link </child>
 		<pose> 0 0 <%= 0.5*PISTON_LENGTH %> 0 0 0 </pose>
-		<axis> 
+		<axis>
 			<xyz> 1 0 0 </xyz>
 			<limit>
 				<lower> -0.786 </lower>
@@ -461,7 +460,7 @@
 		<parent> top_ball5_link </parent>
 		<child> piston5_shaft_link </child>
 		<pose> 0 0 <%= 0.5*PISTON_LENGTH %> 0 0 0 </pose>
-		<axis> 
+		<axis>
 			<xyz> 1 0 0 </xyz>
 			<limit>
 				<lower> -0.786 </lower>
@@ -474,7 +473,7 @@
 		<parent> top_ball6_link </parent>
 		<child> piston6_shaft_link </child>
 		<pose> 0 0 <%= 0.5*PISTON_LENGTH %> 0 0 0 </pose>
-		<axis> 
+		<axis>
 			<xyz> 1 0 0 </xyz>
 			<limit>
 				<lower> -0.786 </lower>

@@ -2,6 +2,7 @@
 <sdf version="1.5">
 
 <model name = "stewart">
+
 	<joint name = "piston1_prismatic_joint" type = "prismatic" >
 		<parent> piston1_cylinder_link </parent>
 		<child> piston1_shaft_link </child>
@@ -461,17 +462,16 @@
 	<link name = "base_link" >
 		<pose> 0 0 0.125 0 0 0 </pose>
 		<inertial>
-			<mass> 10000.0 </mass>
+			<mass> 100000.0 </mass>
 			<inertia>
-				<ixx> 255.20833333333331 </ixx>
+				<ixx> 25520.833333333332 </ixx>
 				<ixy> 0.0 </ixy>
 				<ixz> 0.0</ixz>
-				<iyy> 255.20833333333331 </iyy>
+				<iyy> 25520.833333333332 </iyy>
 				<iyz> 0.0 </iyz>
-				<izz> 500.0 </izz>
+				<izz> 50000.0 </izz>
 			</inertia>
 		</inertial>
-
 
 		<visual name = "base_link_visual" >
 			<geometry>
@@ -529,6 +529,7 @@
 	<link name = "bottom_ball1_link" >
 		<pose> -0.10094113843523252 0.7998817953744161 0.25 0 0 2.0945 </pose>
 
+
 		<visual name = "bottom_ball1_link_visual" >
 			<geometry>
 				<sphere>
@@ -548,6 +549,7 @@
 
 	<link name = "bottom_ball2_link" >
 		<pose> 0.10061530109167109 0.7999228470210314 0.25 0 0 -2.0945 </pose>
+
 
 		<visual name = "bottom_ball2_link_visual" >
 			<geometry>
@@ -569,6 +571,7 @@
 	<link name = "bottom_ball3_link" >
 		<pose> 0.7429993434805581 -0.3129728032712424 0.25 0 0 0 </pose>
 
+
 		<visual name = "bottom_ball3_link_visual" >
 			<geometry>
 				<sphere>
@@ -588,6 +591,7 @@
 
 	<link name = "bottom_ball4_link" >
 		<pose> 0.6421510948171859 -0.4874853550878114 0.25 0 0 2.0945 </pose>
+
 
 		<visual name = "bottom_ball4_link_visual" >
 			<geometry>
@@ -609,6 +613,7 @@
 	<link name = "bottom_ball5_link" >
 		<pose> -0.6433227790696778 -0.48593806388269956 0.25 0 0 -2.0945 </pose>
 
+
 		<visual name = "bottom_ball5_link_visual" >
 			<geometry>
 				<sphere>
@@ -628,6 +633,7 @@
 
 	<link name = "bottom_ball6_link" >
 		<pose> -0.743750623750048 -0.31118324130874175 0.25 0 0 0 </pose>
+
 
 		<visual name = "bottom_ball6_link_visual" >
 			<geometry>
@@ -649,6 +655,7 @@
 	<link name = "top_ball1_link" >
 		<pose> -0.6423496169447003 0.4872237367072718 2.075 0 0 2.0945 </pose>
 
+
 		<visual name = "bottom_ball1_link_visual" >
 			<geometry>
 				<sphere>
@@ -668,6 +675,7 @@
 
 	<link name = "top_ball2_link" >
 		<pose> 0.6421510948171859 0.4874853550878114 2.075 0 0 -2.0945 </pose>
+
 
 		<visual name = "bottom_ball1_link_visual" >
 			<geometry>
@@ -689,6 +697,7 @@
 	<link name = "top_ball3_link" >
 		<pose> 0.7429993434805581 0.3129728032712424 2.075 0 0 0 </pose>
 
+
 		<visual name = "bottom_ball1_link_visual" >
 			<geometry>
 				<sphere>
@@ -708,6 +717,7 @@
 
 	<link name = "top_ball4_link" >
 		<pose> 0.10046706791834908 -0.7999414780244177 2.075 0 0 2.0945 </pose>
+
 
 		<visual name = "bottom_ball1_link_visual" >
 			<geometry>
@@ -1049,7 +1059,6 @@
 	<link name = "piston5_shaft_link" >
 		<pose> -0.3713235548646821 -0.6437385082778523 1.125 -0.33025008757600727 0 -2.0945 </pose>
 
-
 		<visual name = "piston5_shaft_visual" >
 			<geometry>
 				<cylinder>
@@ -1077,7 +1086,6 @@
 
 	<link name = "piston6_shaft_link" >
 		<pose> -0.7431557370007575 0 1.125 -0.33025008757600727 0 0 </pose>
-
 
 		<visual name = "piston6_shaft_visual" >
 			<geometry>

@@ -52,9 +52,8 @@ namespace gazebo
             // having one joint that is the rotational joint.
             this->joints = _model->GetJoints();
 
-            // Setup a P-controller, with a gain of 0.1.
-            //this->pid = common::PID(10, 0, 10);
-            this->pid = common::PID(1000.0, 0.1, 100.0);
+            // Setup a P-controller (some extreme tuning)
+            this->pid = common::PID(1000000, 100000, 50);
 
             // ----------- POSITION -----------
 
