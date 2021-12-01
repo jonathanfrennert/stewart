@@ -14,16 +14,16 @@ def get_x(p0, v0, R, c):
     v = v0
     t = 0.0
     dt = 0.01
-    g = 9.81
+    g = np.array([0.0, 0.0, 9.81]).reshape(3,1)
 
-    while(np.norm(p - c) > R):
+    while(np.linalg.norm(p - c) > R):
         # x and y velocity are constant, but z velocity changes
-        v[2] = v[2] - g*dt
+        v = v - g*dt
 
         p = p + v*dt
 
         t = t + dt
-
+        
         if (t > 10):
             return "Ball either does not intersect or took too long to intersect."
 
@@ -42,9 +42,11 @@ def get_x(p0, v0, R, c):
 
     return (x,t)
 
-p0 = np.array([0, 0, 0]).reshape(3,1)
-v0 = np.array([0, 0, 0]).reshape(3,1)
+p0 = np.array([2, 0, 0]).reshape(3,1)
+pf = np.array([0, 0, 3]).reshape(3,1)
+t = 2.0
+v0 = np.array([(pf[0]-p0[0])/t, (pf[1]-p0[1])/t, (pf[0]-p0[0] + 0.5*9.81*t**2)/t]).reshape(3,1)
 R = 1
-c = np.array([0, 0, 2]).reshape(6,1)
+c = np.array([0, 0, 2]).reshape(3,1)
 
 print(get_x(p0, v0, R, c))
