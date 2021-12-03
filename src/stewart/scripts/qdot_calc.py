@@ -59,7 +59,7 @@ def q_dot(currentPos, currentVel):
         joint_pos = np.sqrt(np.sum(length[:3, :]**2)) - base_length
         current_joint_pos.append(joint_pos)
 
-        joint_vel = (1/current_joint_pos[i]) * (l_dot.T @ l_dot)[0][0]
+        joint_vel = (1/np.sqrt((length.T @ length)[0][0])) * (length.T @ l_dot)[0][0]
         current_joint_vel.append(joint_vel)
 
     return current_joint_vel
