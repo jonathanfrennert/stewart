@@ -14,8 +14,11 @@ from gen_positions import gen_positions
 from velocity import init_velocity
 from x_calc import get_x
 
+import os
+
 import rospy
 import numpy as np
+import pandas as pd
 
 from std_msgs.msg import Float32MultiArray
 
@@ -32,11 +35,15 @@ STEWART_PROTECT_RADIUS = 2
 
 # Cartesian coordinate for center of sphere that Stewart platform will aim to stop
 # balls from entering
-STEWART_PROTECT_CENTER = np.array([0.0, 0.0, 2.5]).reshape(3,1)
+STEWART_PROTECT_CENTER = np.array([0.0, 0.0, 2.2]).reshape(3,1)
+
+# Protection sphere offset so that the stewart platform definitely hits the ball before
+# the ball hits the sphere
+OFFSET = 0.2
 
 # Time (in seconds) at which the first ball will hit the center of the sphere that the Stewart platform
 # is protecting
-BALL1_T = 0.7
+BALL1_T = 1.2
 
 # Time (in seconds) at which the first ball will hit the center of the sphere that the Stewart platform
 # is protecting
@@ -58,12 +65,20 @@ class Generator:
         rospy.sleep(0.25)
 
         # random position of 2 balls that stewart platform will aim to protect against
-        ball1_init_pos, ball2_init_pos = gen_positions(6, 3, 6, 2)
+        #ball1_init_pos, ball2_init_pos = gen_positions(6, 3, 6, 2)
+
+        ball1_init_pos = np.array([0, -4, 1]).reshape(3,1)
+        ball2_init_pos = np.array([0, 6, 2]).reshape(3,1)
+
 
         # initial velocities of balls such that they will hit the center of the sphere
         # that the Stewart platform is trying to protect in BALL1_T and BALL2_T seconds
         ball1_init_vel = init_velocity(ball1_init_pos, STEWART_PROTECT_CENTER, BALL1_T)
         ball2_init_vel = init_velocity(ball2_init_pos, STEWART_PROTECT_CENTER, BALL2_T)
+
+        # Points of intersection of ball trajectories and sphere which Stewart platform is protecting
+        stewart_ball1_meet, time_meet1 = get_x(ball1_init_pos, ball1_init_vel,  STEWART_PROTECT_RADIUS+OFFSET, STEWART_PROTECT_CENTER)
+        stewart_ball2_meet, time_meet2 = get_x(ball2_init_pos, ball2_init_vel, STEWART_PROTECT_RADIUS+OFFSET, STEWART_PROTECT_CENTER)
 
 
         # Set initial position and velocities of balls
@@ -75,29 +90,18 @@ class Generator:
         ball2Msg = Float32MultiArray(data=ball2Data)
         self.pubBall2.publish(ball2Msg)
 
-        calc_delay = time()
-
-        # Points of intersection of ball trajectories and sphere which Stewart platform is protecting
-        stewart_ball1_meet, time_meet1 = get_x(ball1_init_pos, ball1_init_vel,  STEWART_PROTECT_RADIUS+0.4, STEWART_PROTECT_CENTER)
-        stewart_ball2_meet, time_meet2 = get_x(ball2_init_pos, ball2_init_vel, STEWART_PROTECT_RADIUS+0.4, STEWART_PROTECT_CENTER)
-
-        calc_delay = calc_delay - time()
-
-        self.segments = (Goto(STEWART_INIT_CONFIG, stewart_ball1_meet, time_meet1 + calc_delay, 'Joint'),
-                         Goto(stewart_ball1_meet, STEWART_INIT_CONFIG,  (time_meet2 - time_meet1) / 2, 'Joint'),
-                         Goto(STEWART_INIT_CONFIG, stewart_ball2_meet, (time_meet2 - time_meet1) / 2, 'Joint'),
+        self.segments = (Goto(STEWART_INIT_CONFIG, stewart_ball1_meet, time_meet1, 'Joint'),
+                         Goto(stewart_ball1_meet, stewart_ball2_meet, time_meet2 - time_meet1, 'Joint'),
                          Goto(stewart_ball2_meet, STEWART_INIT_CONFIG, 1, 'Joint'),
                          Hold(STEWART_INIT_CONFIG, 100, 'Joint'))
 
-        #test_pos = np.array([0.0,1.0,2.0, 0.0, 0.0, 0.0]).reshape(6,1)
-
-        #self.segments = (Hold(STEWART_INIT_CONFIG, 1, 'Joint'),
-        #                 Goto(STEWART_INIT_CONFIG, test_pos, 2, 'Joint'),
-        #                 Hold(test_pos, 2, 'Joint'))
 
         # Initialize the current segment index and starting time t0.
         self.index = 0
         self.t0    = 0.0
+
+        self.data = []
+        self.sent = False
 
 
     # Update is called every 10ms!
@@ -118,6 +122,16 @@ class Generator:
 
         # Collect and send the JointState message.
         posVelData = list(ikin(s)) + list(q_dot(s, sdot))
+
+        if not self.sent:
+            if t < 10:
+                # for data collection
+                self.data.append([t] + posVelData)
+            else:
+                pd.DataFrame(data=self.data,
+                             columns = ['time', 'q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q1dot', 'q2dot', 'q3dot', 'q4dot', 'q5dot', 'q6dot']).to_csv('posVelData.csv')
+                self.sent = True
+
         rosMsg = Float32MultiArray(data=posVelData)
         self.pubStewart.publish(rosMsg)
 
@@ -142,7 +156,6 @@ if __name__ == "__main__":
 
 
     # Run the servo loop until shutdown (killed or ctrl-C'ed).
-    # Choose the timing method - this is for HW5P2.
     if False:
         # Original timing (measured/variable time step).
         starttime = rospy.Time.now()

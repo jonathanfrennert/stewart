@@ -46,6 +46,7 @@ def ikin(goalPos):
     goal_joint_pos = []
     for i in range(6):
         length = T @ p[i, :].reshape((-1, 1)) - b[i, :].reshape((-1, 1))
-        joint_pos = np.sqrt(np.sum(length[:3, :]**2)) - base_length
+        # joint position should never be negative
+        joint_pos = max(0,np.sqrt(np.sum(length[:3, :]**2)) - base_length)
         goal_joint_pos.append(joint_pos)
     return goal_joint_pos

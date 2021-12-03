@@ -45,10 +45,10 @@ namespace gazebo
             this->joints = _model->GetJoints();
 
             // Setup a position P-controller (some extreme tuning)
-            this->posPid = common::PID(1000000, 100000, 50);
+            this->posPid = common::PID(16384, 512, 0.00001);
 
             // Setup a velocity P-controller (some less extreme tuning)
-            this->velPid = common::PID(10, 1, 0.01);
+            this->velPid = common::PID(2, 0, 0.00001);
 
             // ----------- POSITION -----------
 

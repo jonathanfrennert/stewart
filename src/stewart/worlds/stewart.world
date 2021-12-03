@@ -26,7 +26,7 @@
 
     <model name = "protect_sphere">
       <link name = "sphere_link">
-        <pose> 0 0 2 0 0 0 </pose>
+        <pose> 0 0 2.2 0 0 0 </pose>
         <visual name = "ball_link_visual">
           <geometry>
             <sphere>
@@ -44,7 +44,7 @@
 
     <model name = "ball1">
 			<link name = "ball_link">
-				<pose> 2 0 0 0 0 0 </pose>
+				<pose> 0 20 100 0 0 0 </pose>
 				<inertial>
 					<mass> 0.1 </mass>
 					<inertia>
@@ -79,7 +79,7 @@
 
     <model name = "ball2">
 			<link name = "ball_link">
-				<pose> -2 0 0 0 0 0 </pose>
+				<pose> 0 -20 100 0 0 0 </pose>
 				<inertial>
 					<mass> 0.1 </mass>
 					<inertia>
@@ -111,14 +111,13 @@
       <plugin name="ball2_control" filename="libball2_plugin.so"/>
 		</model>
 
-
     <gui fullscreen='0'>
-      <camera name='user_camera'>
-        <pose>13.3338 -10.0027 7.31158 0 0.275643 2.35619</pose>
-        <view_controller>orbit</view_controller>
-        <projection_type>perspective</projection_type>
-      </camera>
-    </gui>
+    <camera name='user_camera'>
+    <pose>13.3338 -10.0027 7.31158 0 0.275643 2.35619</pose>
+    <view_controller>orbit</view_controller>
+    <projection_type>perspective</projection_type>
+  </camera>
+  </gui>
 
   </world>
 </sdf>

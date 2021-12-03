@@ -230,4 +230,9 @@ CATKIN_IGNORE
 .catkin_workspace
 
 
+# recording
+/log
+/video
+
+
 # End of https://www.toptal.com/developers/gitignore/api/ros,python,c++
