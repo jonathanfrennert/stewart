@@ -4,6 +4,9 @@
 #include <vector>
 #include <thread>
 
+#include <iostream>
+#include <fstream>
+
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
 #include <gazebo/common/common.hh>
@@ -12,6 +15,8 @@
 #include "ros/callback_queue.h"
 #include "ros/subscribe_options.h"
 #include "std_msgs/Float32MultiArray.h"
+
+
 
 
 namespace gazebo
@@ -45,10 +50,11 @@ namespace gazebo
             this->joints = _model->GetJoints();
 
             // Setup a position P-controller (some extreme tuning)
-            this->posPid = common::PID(16384, 512, 0.00001);
+            this->posPid = common::PID(65384, 1024, 0.01);
 
             // Setup a velocity P-controller (some less extreme tuning)
             this->velPid = common::PID(2, 0, 0.00001);
+
 
             // ----------- POSITION -----------
 
@@ -106,6 +112,28 @@ namespace gazebo
         {
           this->setPosition(msg);
           this->setVelocity(msg);
+
+          double time = ros::Time::now().toSec();
+
+          if (time <= 10)
+          {
+            csvFile.open("actualPosVel.csv", std::ios::app);
+
+            csvFile << time << ",";
+            auto joints_it = std::begin(this->joints);
+            for (int i = 0; i < 6; i++)
+            {
+                auto joint = *joints_it++;
+                auto pos = this->model->GetJointController()->GetPositions()[joint->GetScopedName()];
+                auto vel = this->model->GetJointController()->GetVelocities()[joint->GetScopedName()];
+                csvFile << pos << ",";
+                csvFile << vel << ",";
+            }
+            csvFile << std::endl;
+
+            csvFile.close();
+          }
+
         }
 
         /// \brief Set the position of all the joints
@@ -113,7 +141,7 @@ namespace gazebo
         void setPosition(const std_msgs::Float32MultiArray::ConstPtr& msg)
         {
             auto joints_it = std::begin(this->joints);
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 6; i++)
                 this->model->GetJointController()->SetPositionTarget((*joints_it++)->GetScopedName(), msg->data[i]);
         }
 
@@ -123,7 +151,7 @@ namespace gazebo
         void setVelocity(const std_msgs::Float32MultiArray::ConstPtr& msg)
         {
             auto joints_it = std::begin(this->joints);
-            for (int i = 6; i < 11; i++)
+            for (int i = 6; i < 12; i++)
                 this->model->GetJointController()->SetVelocityTarget((*joints_it++)->GetScopedName(), msg->data[i]);
         }
 
@@ -137,6 +165,10 @@ namespace gazebo
             this->rosQueue.callAvailable(ros::WallDuration(timeout));
           }
         }
+
+
+        // Logging
+        private: std::ofstream csvFile;
 
 
         // ----------- MODEL -----------

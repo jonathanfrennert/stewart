@@ -22,7 +22,6 @@ def get_x(p0, v0, R, c):
         t = t + dt
 
         if (np.linalg.norm(p - c) < R):
-            print(t)
             break
 
         if (t > 1000):

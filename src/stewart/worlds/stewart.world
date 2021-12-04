@@ -26,7 +26,7 @@
 
     <model name = "protect_sphere">
       <link name = "sphere_link">
-        <pose> 0 0 2.2 0 0 0 </pose>
+        <pose> 0 0 2.0 0 0 0 </pose>
         <visual name = "ball_link_visual">
           <geometry>
             <sphere>

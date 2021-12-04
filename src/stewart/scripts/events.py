@@ -35,7 +35,7 @@ STEWART_PROTECT_RADIUS = 2
 
 # Cartesian coordinate for center of sphere that Stewart platform will aim to stop
 # balls from entering
-STEWART_PROTECT_CENTER = np.array([0.0, 0.0, 2.2]).reshape(3,1)
+STEWART_PROTECT_CENTER = np.array([0.0, 0.0, 2.0]).reshape(3,1)
 
 # Protection sphere offset so that the stewart platform definitely hits the ball before
 # the ball hits the sphere
@@ -43,11 +43,11 @@ OFFSET = 0.2
 
 # Time (in seconds) at which the first ball will hit the center of the sphere that the Stewart platform
 # is protecting
-BALL1_T = 1.2
+BALL1_T = 1
 
 # Time (in seconds) at which the first ball will hit the center of the sphere that the Stewart platform
 # is protecting
-BALL2_T = 2
+BALL2_T = 2.5
 
 
 #
@@ -65,10 +65,10 @@ class Generator:
         rospy.sleep(0.25)
 
         # random position of 2 balls that stewart platform will aim to protect against
-        #ball1_init_pos, ball2_init_pos = gen_positions(6, 3, 6, 2)
+        ball1_init_pos, ball2_init_pos = gen_positions(6, 3, 6, 2)
 
-        ball1_init_pos = np.array([0, -4, 1]).reshape(3,1)
-        ball2_init_pos = np.array([0, 6, 2]).reshape(3,1)
+        #ball1_init_pos = np.array([0.5, -4, 2]).reshape(3,1)
+        #ball2_init_pos = np.array([-0.5, 6, 2]).reshape(3,1)
 
 
         # initial velocities of balls such that they will hit the center of the sphere
@@ -80,7 +80,6 @@ class Generator:
         stewart_ball1_meet, time_meet1 = get_x(ball1_init_pos, ball1_init_vel,  STEWART_PROTECT_RADIUS+OFFSET, STEWART_PROTECT_CENTER)
         stewart_ball2_meet, time_meet2 = get_x(ball2_init_pos, ball2_init_vel, STEWART_PROTECT_RADIUS+OFFSET, STEWART_PROTECT_CENTER)
 
-
         # Set initial position and velocities of balls
         ball1Data = list(ball1_init_pos) + list(ball1_init_vel)
         ball1Msg = Float32MultiArray(data=ball1Data)
@@ -91,10 +90,10 @@ class Generator:
         self.pubBall2.publish(ball2Msg)
 
         self.segments = (Goto(STEWART_INIT_CONFIG, stewart_ball1_meet, time_meet1, 'Joint'),
-                         Goto(stewart_ball1_meet, stewart_ball2_meet, time_meet2 - time_meet1, 'Joint'),
+                         Goto(stewart_ball1_meet, STEWART_INIT_CONFIG, (time_meet2 - time_meet1) / 2, 'Joint'),
+                         Goto(STEWART_INIT_CONFIG, stewart_ball2_meet, (time_meet2 - time_meet1) / 2, 'Joint'),
                          Goto(stewart_ball2_meet, STEWART_INIT_CONFIG, 1, 'Joint'),
                          Hold(STEWART_INIT_CONFIG, 100, 'Joint'))
-
 
         # Initialize the current segment index and starting time t0.
         self.index = 0
@@ -121,7 +120,7 @@ class Generator:
         (s, sdot) = self.segments[self.index].evaluate(t - self.t0)
 
         # Collect and send the JointState message.
-        posVelData = list(ikin(s)) + list(q_dot(s, sdot))
+        posVelData = ikin(s) + list(q_dot(s, sdot))
 
         if not self.sent:
             if t < 10:
