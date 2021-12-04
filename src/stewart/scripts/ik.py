@@ -1,23 +1,23 @@
 import numpy as np
-import os
-import sys
 
 def transformation_matrix(x, y, z, roll, pitch, yaw):
     """
-    Transformation matrix
-    INPUT: SCALARS
-    OUTPUT: 4X4 NUMPY ARRAY
+    Transformation matrix calculator
+    INPUT: Float scalars
+    OUTPUT: 4X4 Numpy matrix
     """
-    T = np.array([[np.cos(yaw) * np.cos(pitch), -np.sin(yaw)*np.cos(roll) + np.cos(yaw)*np.sin(pitch)*np.sin(roll),  np.sin(yaw)*np.sin(roll)+np.cos(yaw)*np.sin(pitch)*np.cos(roll), x],
+
+    # Transformation matrix calculator
+    T = np.array([[np.cos(yaw) * np.cos(pitch), -np.sin(yaw)*np.cos(roll) + np.cos(yaw)*np.sin(pitch)*np.sin(roll), np.sin(yaw)*np.sin(roll)+np.cos(yaw)*np.sin(pitch)*np.cos(roll), x],
                   [np.sin(yaw)*np.cos(pitch),  np.cos(yaw)*np.cos(roll) + np.sin(yaw)*np.sin(pitch)*np.sin(roll), -np.cos(yaw)*np.sin(roll)+np.sin(yaw)*np.sin(pitch)*np.cos(roll), y],
-                  [-np.sin(pitch),  np.cos(pitch)*np.sin(roll), np.cos(pitch)*np.cos(yaw), z],
+                  [-np.sin(pitch), np.cos(pitch)*np.sin(roll), np.cos(pitch)*np.cos(yaw), z],
                   [0., 0., 0., 1.]])
     return T
 
 def ikin(goalPos):
     """
     Ikin method
-    INPUT: goalPos as numpy column pls!!!!!
+    INPUT: column vector of floats
     OUTPUT: List
     """
     # All inputs as numpy array NO ROS MESSAGEs

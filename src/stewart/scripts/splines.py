@@ -36,6 +36,8 @@
 #
 #   The p0,pf,v0,vf,a0,af may be NumPy arrays.
 #
+# REFERENCE: These files are from CS133a PSETS
+
 import math
 
 

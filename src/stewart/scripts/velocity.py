@@ -2,7 +2,7 @@ import numpy as np
 
 def init_velocity(p0, pf, t):
     """
-    p0, pf: Column vector
+    p0, pf: Column vector of floats
     t: float
     """
 

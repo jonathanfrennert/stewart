@@ -1,13 +1,13 @@
 import numpy as np
-import sys
-import os
 
 def transformation_matrix(x, y, z, roll, pitch, yaw):
     """
-    Transformation matrix
-    INPUT: SCALARS
-    OUTPUT: 4X4 NUMPY ARRAY
+    Transformation matrix calculator
+    INPUT: Float scalars
+    OUTPUT: 4X4 NUMPY matrix
     """
+
+    # Transformation matrix calculator
     T = np.array([[np.cos(yaw) * np.cos(pitch), -np.sin(yaw)*np.cos(roll) + np.cos(yaw)*np.sin(pitch)*np.sin(roll),  np.sin(yaw)*np.sin(roll)+np.cos(yaw)*np.sin(pitch)*np.cos(roll), x],
                   [np.sin(yaw)*np.cos(pitch),  np.cos(yaw)*np.cos(roll) + np.sin(yaw)*np.sin(pitch)*np.sin(roll), -np.cos(yaw)*np.sin(roll)+np.sin(yaw)*np.sin(pitch)*np.cos(roll), y],
                   [-np.sin(pitch),  np.cos(pitch)*np.sin(roll), np.cos(pitch)*np.cos(yaw), z],
@@ -17,7 +17,7 @@ def transformation_matrix(x, y, z, roll, pitch, yaw):
 def q_dot(currentPos, currentVel):
     """
     Q dot calculator
-    Input: Column vectors
+    Input: Column vectors of floats
     Output: List
     """
 
