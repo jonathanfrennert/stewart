@@ -9,5 +9,6 @@ We would like to mention that this would not have been possible without the SDF 
 Clone this repo to your catkin workspace `src/` directory and build it using `catkin`. Run the following commands
 
 `catkin build stewart`
+
 `source ~/your_catkin_ws/devel/setup.bash`
 
